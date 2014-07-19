@@ -1,34 +1,80 @@
 <head>
-  <title>Leaderboard</title>
+  <title>billFold</title>
 </head>
 
 <body>
   <div id="outer">
-    {{> leaderboard}}
+    {{> grid }}
   </div>
 </body>
 
-<template name="leaderboard">
-  <div class="leaderboard">
-    {{#each players}}
-      {{> player}}
-    {{/each}}
-  </div>
+<template name="grid">
+  <table class="grid">
+    <tr>
+      <td></td>
+      {{#each roommates}}
+        <td>
+          {{> roommate}}
+        </td>
+      {{/each}}
 
-  {{#if selected_name}}
-  <div class="details">
-    <div class="name">{{selected_name}}</div>
-    <input type="button" class="inc" value="Give 5 points" />
-  </div>
-  {{else}}
-  <div class="none">Click a player to select</div>
-  {{/if}}
+      <td>
+        <form class="new_roommate">
+          <input type="text" name="name" placeholder="name" />
+          <input type="date" name="arrival_date"/>
+          <input type="date" name="departure_date"/>
+          <input type="submit" value="New roommmate">
+        </form>
+      </td>
+
+    </tr>
+
+    {{#each bills}}
+      <tr>
+        <td>
+          {{> bill}}  
+        </td>
+        {{#each roommates}}
+          <td>
+            {{../name}}
+            {{name}}
+          </td>
+        {{/each}}
+      </tr>
+    {{/each}}
+
+    <tr>
+      <td>
+        <form class="new_bill">
+          <input type="text" name="name" placeholder="name" />
+          <input type="number" name="amount" placeholder="amount" step="any" />
+          <input type="date" name="arrival_date" />
+          <input type="date" name="departure_date" />
+          <input type="submit" value="New Bill">
+        </form>
+      </td>
+    </tr>
+
+  </table>
 </template>
 
-<template name="player">
-  <div class="player {{selected}}">
-    <span class="name">{{name}}</span>
-    <span class="score">{{score}}</span>
+<template name="roommate">
+  <div class="roommate">
+    <input type="text" name="name" placeholder="name" value={{name}} data-roommateid={{_id}}>
+    <input type="date" name="arrival_date" value={{arrival_date}} data-roommateid={{_id}}>
+    <input type="date" name="departure_date" value={{departure_date}} data-roommateid={{_id}}>
+    <input type="button" class="delete_roommate" value="delete" data-roommateid={{_id}}>
+  </div>
+</template>
+
+<template name="bill">
+  <div class="bill">
+    <input type="text"   data-billid={{_id}} name="name"           value={{name}} placeholder="name">
+    <input type="number" data-billid={{_id}} name="amount"         value={{amount}} placeholder="amount" step="any" >
+    <input type="date"   data-billid={{_id}} name="arrival_date"   value={{arrival_date}}>
+    <input type="date"   data-billid={{_id}} name="departure_date" value={{departure_date}}>
+
+    <input type="button" class="delete_bill" value="delete" data-billid={{_id}} />
   </div>
 </template>
 
