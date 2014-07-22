@@ -3,12 +3,50 @@
 </head>
 
 <body>
+  <h1> BillFold </h1>
   <div id="outer">
     {{> grid }}
   </div>
 </body>
 
 <template name="grid">
+
+  <h4> Add a new roommate </h4>
+  <form class="new_roommate">
+    <input type="text" name="name" placeholder="roommate name" />
+    <br>
+    <label for="arrival_date">Arrival date</label>
+    <input type="date" name="arrival_date"/>
+    <br>
+    <label for="departure_date">Departure date</label>
+    <input type="date" name="departure_date"/>
+    <input type="submit" value="New roommmate">
+  </form>
+
+  <h4> Add a new bill </h4>
+  <form class="new_bill">
+    <input type="text" name="name" placeholder="bill name" />
+    <input type="number" name="amount" placeholder="amount" step="any" />
+    <br>
+    <label for="arrival_date">Arrival date</label>
+    <input type="date" name="arrival_date" />
+    <br>
+    <label for="departure_date">Departure date</label>
+    <input type="date" name="departure_date" />
+    <input type="submit" value="New Bill">
+  </form>
+
+  <h4> Add a new payment </h4>
+  <form class="new_payment">
+    <select name="payer" >
+      {{#each roommates}}
+        <option value="{{_id}}">{{name}}</option>
+      {{/each}}
+    </select>
+    <input type="number" name="amount" placeholder="amount" step="any" />
+    <input type="submit" value="New Payment">
+  </form>
+
   <table class="grid">
     <tr>
       <td></td>
@@ -17,16 +55,6 @@
           {{> roommate}}
         </td>
       {{/each}}
-
-      <td>
-        <form class="new_roommate">
-          <input type="text" name="name" placeholder="name" />
-          <input type="date" name="arrival_date"/>
-          <input type="date" name="departure_date"/>
-          <input type="submit" value="New roommmate">
-        </form>
-      </td>
-
     </tr>
 
     {{#each bills}}
@@ -36,33 +64,30 @@
         </td>
         {{#each roommates}}
           <td>
-            {{../name}}
-            {{name}}
+            owed: {{owed roommate_id=_id bill_id=../_id}}
+            <hr>
+            paid {{ paid roommate_id=_id bill_id=../_id}}
           </td>
         {{/each}}
       </tr>
     {{/each}}
-
-    <tr>
-      <td>
-        <form class="new_bill">
-          <input type="text" name="name" placeholder="name" />
-          <input type="number" name="amount" placeholder="amount" step="any" />
-          <input type="date" name="arrival_date" />
-          <input type="date" name="departure_date" />
-          <input type="submit" value="New Bill">
-        </form>
-      </td>
-    </tr>
-
   </table>
+
+  <ul>
+    {{#each payments}}
+      <li>
+        {{> payment}}
+      </li>
+    {{/each}}
+  </ul>
+
 </template>
 
 <template name="roommate">
   <div class="roommate">
     <input type="text" name="name" placeholder="name" value={{name}} data-roommateid={{_id}}>
-    <input type="date" name="arrival_date" value={{arrival_date}} data-roommateid={{_id}}>
-    <input type="date" name="departure_date" value={{departure_date}} data-roommateid={{_id}}>
+    <input type="date" name="arrival_date" value={{prettifyDate arrival_date}} data-roommateid={{_id}}>
+    <input type="date" name="departure_date" value={{prettifyDate departure_date}} data-roommateid={{_id}}>
     <input type="button" class="delete_roommate" value="delete" data-roommateid={{_id}}>
   </div>
 </template>
@@ -71,10 +96,17 @@
   <div class="bill">
     <input type="text"   data-billid={{_id}} name="name"           value={{name}} placeholder="name">
     <input type="number" data-billid={{_id}} name="amount"         value={{amount}} placeholder="amount" step="any" >
-    <input type="date"   data-billid={{_id}} name="arrival_date"   value={{arrival_date}}>
-    <input type="date"   data-billid={{_id}} name="departure_date" value={{departure_date}}>
+    <input type="date"   data-billid={{_id}} name="arrival_date"   value={{prettifyDate arrival_date}}>
+    <input type="date"   data-billid={{_id}} name="departure_date" value={{prettifyDate departure_date}}>
 
     <input type="button" class="delete_bill" value="delete" data-billid={{_id}} />
   </div>
 </template>
 
+<template name="payment">
+  <div class="payment">
+    {{payer_name payer}}, $ {{amount}}
+
+    <input type="button" class="delete_payment" value="delete" data-paymentid={{_id}} />
+  </div>
+</template>
