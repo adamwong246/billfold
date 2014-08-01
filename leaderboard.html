@@ -10,22 +10,12 @@
 </body>
 
 <template name="grid">
+  {{> loginButtons}}
 
-  <h4> Add a new roommate </h4>
-  <form class="new_roommate">
-    <input type="text" name="name" placeholder="roommate name" />
-    <br>
-    <label for="arrival_date">Arrival date</label>
-    <input type="date" name="arrival_date"/>
-    <br>
-    <label for="departure_date">Departure date</label>
-    <input type="date" name="departure_date"/>
-    <input type="submit" value="New roommmate">
-  </form>
-
-  <h4> Add a new bill </h4>
+  <h4> Add a new Bill </h4>
   <form class="new_bill">
     <input type="text" name="name" placeholder="bill name" />
+    <br>
     <input type="number" name="amount" placeholder="amount" step="any" />
     <br>
     <label for="arrival_date">Arrival date</label>
@@ -33,80 +23,126 @@
     <br>
     <label for="departure_date">Departure date</label>
     <input type="date" name="departure_date" />
+    <br>
+    <select name="owner" >
+      {{#each users}}
+        <option value="{{_id}}">{{identify_user _id}}</option>
+      {{/each}}
+    </select>
+    <br>
     <input type="submit" value="New Bill">
+  </form>
+
+  <h4> Add a new UserBill </h4>
+  <form class="new_user_bill">
+
+    <select name="user" >
+      {{#each users}}
+        <option value="{{_id}}">{{identify_user _id}}</option>
+      {{/each}}
+    </select>
+    <br>
+    <select name="bill" >
+      {{#each bills}}
+        <option value="{{_id}}">{{name}}</option>
+      {{/each}}
+    </select>
+
+    <br>
+    <label for="arrival_date">Arrival date</label>
+    <input type="date" name="arrival_date"/>
+    <br>
+    <label for="departure_date">Departure date</label>
+    <input type="date" name="departure_date"/>
+    <br>
+    <input type="submit" value="New user bill">
   </form>
 
   <h4> Add a new payment </h4>
   <form class="new_payment">
+    payer:
     <select name="payer" >
-      {{#each roommates}}
-        <option value="{{_id}}">{{name}}</option>
+      {{#each users}}
+        <option value="{{_id}}">{{identify_user this}}</option>
       {{/each}}
     </select>
+    <br>
+    payee:
+    <select name="payee" >
+      {{#each users}}
+        <option value="{{_id}}">{{identify_user this}}</option>
+      {{/each}}
+    </select>
+    <br>
     <input type="number" name="amount" placeholder="amount" step="any" />
+    <br>
     <input type="submit" value="New Payment">
   </form>
 
-  <table class="grid">
-    <tr>
-      <td></td>
-      {{#each roommates}}
-        <td>
-          {{> roommate}}
-        </td>
-      {{/each}}
-    </tr>
-
-    {{#each bills}}
-      <tr>
-        <td>
-          {{> bill}}  
-        </td>
-        {{#each roommates}}
-          <td>
-            owed: {{owed roommate_id=_id bill_id=../_id}}
-            <hr>
-            paid {{ paid roommate_id=_id bill_id=../_id}}
-          </td>
-        {{/each}}
-      </tr>
+  <h4> users </h4>
+  <ol>
+    {{#each users}}
+      <li>
+        {{> user}}
+      </li>
     {{/each}}
-  </table>
+  </ol>
 
-  <ul>
+  <h4> bills </h4>
+  <ol>
+    {{#each bills}}
+      <li>
+        {{> bill}}
+      </li>
+    {{/each}}
+  </ol>
+
+  <h4> user bills </h4>
+  <ol>
+    {{#each user_bills}}
+      <li>
+        {{> user_bill}}
+      </li>
+    {{/each}}
+  </ol>
+
+  <h4> payments </h4>
+  <ol>
     {{#each payments}}
       <li>
         {{> payment}}
       </li>
     {{/each}}
-  </ul>
+  </ol>
 
 </template>
 
-<template name="roommate">
-  <div class="roommate">
-    <input type="text" name="name" placeholder="name" value={{name}} data-roommateid={{_id}}>
-    <input type="date" name="arrival_date" value={{prettifyDate arrival_date}} data-roommateid={{_id}}>
-    <input type="date" name="departure_date" value={{prettifyDate departure_date}} data-roommateid={{_id}}>
-    <input type="button" class="delete_roommate" value="delete" data-roommateid={{_id}}>
+<template name="user">
+  <div class="user">
+    {{identify_user this}}
   </div>
 </template>
 
 <template name="bill">
   <div class="bill">
-    <input type="text"   data-billid={{_id}} name="name"           value={{name}} placeholder="name">
-    <input type="number" data-billid={{_id}} name="amount"         value={{amount}} placeholder="amount" step="any" >
-    <input type="date"   data-billid={{_id}} name="arrival_date"   value={{prettifyDate arrival_date}}>
-    <input type="date"   data-billid={{_id}} name="departure_date" value={{prettifyDate departure_date}}>
-
+    {{name}}, ${{amount}}, {{prettifyDate arrival_date}} --- {{prettifyDate departure_date}}
     <input type="button" class="delete_bill" value="delete" data-billid={{_id}} />
   </div>
 </template>
 
 <template name="payment">
   <div class="payment">
-    {{payer_name payer}}, $ {{amount}}
-
+    From: {{identify_user payer}}, To: {{identify_user payee}}, ${{amount}}
     <input type="button" class="delete_payment" value="delete" data-paymentid={{_id}} />
+  </div>
+</template>
+
+<template name="user_bill">
+  <div class="user_bill">
+    {{identify_user user}}
+    {{identify_bill bill}}
+    {{prettifyDate arrival_date}} --- {{prettifyDate departure_date}}
+    ${{owed}}
+    <input type="button" class="delete_user_bill" value="delete" data-userbillid={{_id}} />
   </div>
 </template>
