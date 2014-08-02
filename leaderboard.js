@@ -1,6 +1,6 @@
 UserBills = new Meteor.Collection("user_bills");
 Bills     = new Meteor.Collection("bills");
-Payments  = new Meteor.Collection('payment');
+Payments  = new Meteor.Collection('payments');
 
 Handlebars.registerHelper("prettifyDate", function(date) {
   if (date == null) {
@@ -61,6 +61,8 @@ if (Meteor.isClient) {
         return Bills.find({_id: ub.bill, owner: option.hash.payee._id}).count() == 1;
       }).reduce(function(m, e, i, a){
         return m + ownage(e);
+      }, 0) - Payments.find({payer: option.hash.payer._id, payee: option.hash.payee._id}).fetch().reduce(function(m,e,i,a){
+        return m + parseInt(e.amount);
       }, 0);
 
     }
