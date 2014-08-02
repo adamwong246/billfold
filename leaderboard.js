@@ -3,7 +3,11 @@ Bills     = new Meteor.Collection("bills");
 Payments  = new Meteor.Collection('payment');
 
 Handlebars.registerHelper("prettifyDate", function(date) {
-  return date.toISOString().substring(0, 10);
+  if (date == null) {
+    return date;
+  } else {
+    return date.toISOString().substring(0, 10);
+  }
 });
 
 Handlebars.registerHelper("identify", function(thing){
@@ -85,8 +89,12 @@ if (Meteor.isClient) {
     'submit form.new_bill': function(event) {
       Bills.insert({
         name: event.target.elements.namedItem('name').value,
-        arrival_date:new Date(event.target.elements.namedItem('arrival_date').value),
-        departure_date: new Date(event.target.elements.namedItem('departure_date').value),
+        arrival_date: (
+          (event.target.elements.namedItem('arrival_date').value == "") ? null : new Date(event.target.elements.namedItem('arrival_date').value)
+        ),
+        departure_date: (
+          (event.target.elements.namedItem('departure_date').value == "") ? null : new Date(event.target.elements.namedItem('departure_date').value)
+        ),
         amount: event.target.elements.namedItem('amount').value,
         owner: event.target.elements.namedItem('owner').value
       });
@@ -97,8 +105,12 @@ if (Meteor.isClient) {
       UserBills.insert({
         user: event.target.elements.namedItem('user').value,
         bill: event.target.elements.namedItem('bill').value,
-        arrival_date:new Date(event.target.elements.namedItem('arrival_date').value),
-        departure_date: new Date(event.target.elements.namedItem('departure_date').value),
+        arrival_date: (
+          (event.target.elements.namedItem('arrival_date').value == "") ? null : new Date(event.target.elements.namedItem('arrival_date').value)
+        ),
+        departure_date: (
+          (event.target.elements.namedItem('departure_date').value == "") ? null : new Date(event.target.elements.namedItem('departure_date').value)
+        ),
       });
     },
 
