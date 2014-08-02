@@ -89,31 +89,55 @@
   </ol>
 
   <h4> bills </h4>
-  <ol>
+  <table>
     {{#each bills}}
-      <li>
-        {{> bill}}
-      </li>
+      {{> bill}}
     {{/each}}
-  </ol>
+  </table>
 
   <h4> user bills </h4>
-  <ol>
+  <table>
     {{#each user_bills}}
-      <li>
-        {{> user_bill}}
-      </li>
+      {{> user_bill}}
     {{/each}}
-  </ol>
+  </table>
 
   <h4> payments </h4>
-  <ol>
+  <table>
     {{#each payments}}
-      <li>
-        {{> payment}}
-      </li>
+      {{> payment}}
     {{/each}}
-  </ol>
+  </table>
+
+  <h3>Balance sheet</h3>
+  <table>
+    <tr>
+      <td></td>
+      {{#each users}}
+        <td>
+          {{identify_user this}}
+        </td>
+      {{/each}}
+    </tr>
+
+    {{#each users}}
+      <tr>
+        <td>
+          {{identify_user this}}
+        </td>
+
+        {{#each users}}
+          <td>
+            {{!identify_user this}}
+            {{!identify_user ..}}
+            {{user_owes_user payer=this payee=..}}
+          </td>
+        {{/each}}
+
+      </tr>
+    {{/each}}
+
+  </table>
 
 </template>
 
@@ -124,25 +148,64 @@
 </template>
 
 <template name="bill">
-  <div class="bill">
-    {{name}}, ${{amount}}, {{prettifyDate arrival_date}} --- {{prettifyDate departure_date}}
-    <input type="button" class="delete_bill" value="delete" data-billid={{_id}} />
-  </div>
-</template>
-
-<template name="payment">
-  <div class="payment">
-    From: {{identify_user payer}}, To: {{identify_user payee}}, ${{amount}}
-    <input type="button" class="delete_payment" value="delete" data-paymentid={{_id}} />
-  </div>
+  <tr class="bill">
+    <td>
+      <input type="button" class="delete_bill" value="delete" data-billid={{_id}} />
+    </td>
+    <td>
+      {{identify_user owner}}
+    </td>
+    <td>
+      {{name}}
+    </td>
+    <td>
+      ${{amount}}
+    </td>
+    <td>
+      {{prettifyDate arrival_date}}
+    </td>
+    <td>
+      {{prettifyDate departure_date}}
+    </td>
+  </tr>
 </template>
 
 <template name="user_bill">
-  <div class="user_bill">
-    {{identify_user user}}
-    {{identify_bill bill}}
-    {{prettifyDate arrival_date}} --- {{prettifyDate departure_date}}
-    ${{owed}}
-    <input type="button" class="delete_user_bill" value="delete" data-userbillid={{_id}} />
-  </div>
+  <tr class="user_bill">
+    <td>
+      <input type="button" class="delete_user_bill" value="delete" data-userbillid={{_id}} />
+    </td>
+    <td>
+      {{identify_user user}}
+    </td>
+    <td>
+      {{identify_bill bill}}
+    </td>
+    <td>
+      {{prettifyDate arrival_date}}
+    </td>
+    <td>
+      {{prettifyDate departure_date}}
+    </td>
+    <td>
+      ${{owed}}
+    </td>
+  </tr>
+</template>
+
+<template name="payment">
+  <tr class="payment">
+    <td>
+      <input type="button" class="delete_payment" value="delete" data-paymentid={{_id}} />
+    </td>
+    <td>
+      From: {{identify_user payer}}
+    </td>
+    <td>
+      To: {{identify_user payee}}
+    </td>
+    <td>
+      ${{amount}}
+    </td>
+  </tr>
 </template>

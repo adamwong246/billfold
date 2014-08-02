@@ -25,6 +25,45 @@ Handlebars.registerHelper("identify_bill", function(bill){
   return b && b.name ? b.name : "";
 });
 
+function ownage(user_bill) {
+  var user = Meteor.users.findOne(user_bill.user);
+  var bill = Bills.findOne(user_bill.bill);
+
+  if (bill && user ) {
+    if ((user_bill.arrival_date <= bill.departure_date) && (user_bill.departure_date >= bill.arrival_date)) {
+
+      // the difference in days of the bill's timespan
+      var timeDiff = Math.abs(bill.departure_date.getTime() - bill.arrival_date.getTime());
+      var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+      
+      // range to calculate over
+      var lesser  = new Date(Math.max  (user_bill.arrival_date, bill.arrival_date));
+      var greater = new Date(Math.min  (user_bill.departure_date, bill.departure_date));
+
+      var accumulator = 0;
+
+      for (var d = lesser; d < greater; d.setDate(d.getDate() + 1)) {
+
+        // number of UserBills present on this day
+        var user_count = UserBills.find({ arrival_date: { $lt: d }, departure_date: { $gt: d } }).count();
+        
+        // prevent division by zero
+        if (user_count > 0){
+          // add to accumulated total payment for user and bill
+          accumulator += ((bill.amount / user_count)/diffDays);
+        }
+
+      }
+
+      return accumulator;
+    }
+
+    return 0;
+  } else {
+    return 'fail';
+  }
+}
+
 if (Meteor.isClient) {
 
   Template.grid.users = function (){
@@ -43,7 +82,6 @@ if (Meteor.isClient) {
   Template.user_bill.owed = function () {
     var user = Meteor.users.findOne(this.user);
     var bill = Bills.findOne(this.bill);
-
 
     if (bill && user ) {
       if ((this.arrival_date <= bill.departure_date) && (this.departure_date >= bill.arrival_date)) {
@@ -78,6 +116,25 @@ if (Meteor.isClient) {
     } else {
       return 'fail';
     }
+  };
+
+  Template.grid.user_owes_user = function(option){
+    if (option.hash.payer._id != option.hash.payee._id){
+      var payer = Meteor.users.findOne(option.hash.payer);
+      var payee = Meteor.users.findOne(option.hash.payee);
+      var user_bills = UserBills.find({user: payee._id});
+
+      if (user_bills.count() > 0){
+        return user_bills.fetch().reduce(function(previousValue, user_bill, index, array){
+          return previousValue + ownage(user_bill);
+        }, 0);
+      } else {
+        return 0;
+      }
+    } else {
+      return "na";
+    }
+
   };
 
   Template.grid.paid = function (options) {
