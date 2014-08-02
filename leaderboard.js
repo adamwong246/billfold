@@ -49,20 +49,20 @@ if (Meteor.isClient) {
   };
 
   Template.grid.user_owes_user = function(option){
-    if (option.hash.payer._id != option.hash.payee._id){
-      var payer = Meteor.users.findOne(option.hash.payer);
-      var payee = Meteor.users.findOne(option.hash.payee);
-      var user_bills = UserBills.find({user: payee._id});
 
-      if (user_bills.count() > 0){
-        return user_bills.fetch().reduce(function(previousValue, user_bill, index, array){
-          return previousValue + ownage(user_bill);
-        }, 0);
-      } else {
-        return 0;
-      }
+    var user_bills = UserBills.find({user: option.hash.payer._id});//.filter(function(ub){
+    //   return Bills.findOne({}, {user: option.hash.payee._id});
+    // });
+
+    if (user_bills.count() < 1 ) {
+      return 0;
     } else {
-      return "na";
+      return user_bills.fetch().filter(function(ub){
+        return Bills.find({_id: ub.bill, owner: option.hash.payee._id}).count() == 1;
+      }).reduce(function(m, e, i, a){
+        return m + ownage(e);
+      }, 0);
+
     }
 
   };
