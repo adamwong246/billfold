@@ -45,7 +45,7 @@ function ownage(user_bill) {
       for (var d = lesser; d < greater; d.setDate(d.getDate() + 1)) {
 
         // number of UserBills present on this day
-        var user_count = UserBills.find({ arrival_date: { $lt: d }, departure_date: { $gt: d } }).count();
+        var user_count = UserBills.find({ arrival_date: { $lt: d }, departure_date: { $gt: d }, bill: bill._id }).count();
         
         // prevent division by zero
         if (user_count > 0){
@@ -99,7 +99,7 @@ if (Meteor.isClient) {
         for (var d = lesser; d < greater; d.setDate(d.getDate() + 1)) {
 
           // number of UserBills present on this day
-          var user_count = UserBills.find({ arrival_date: { $lt: d }, departure_date: { $gt: d } }).count();
+          var user_count = UserBills.find({ arrival_date: { $lt: d }, departure_date: { $gt: d }, bill: this.bill }).count();
           
           // prevent division by zero
           if (user_count > 0){

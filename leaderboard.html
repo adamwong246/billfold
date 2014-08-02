@@ -150,13 +150,10 @@
 <template name="bill">
   <tr class="bill">
     <td>
-      <input type="button" class="delete_bill" value="delete" data-billid={{_id}} />
+      {{name}}
     </td>
     <td>
       {{identify_user owner}}
-    </td>
-    <td>
-      {{name}}
     </td>
     <td>
       ${{amount}}
@@ -167,14 +164,14 @@
     <td>
       {{prettifyDate departure_date}}
     </td>
+    <td>
+      <input type="button" class="delete_bill" value="delete" data-billid={{_id}} />
+    </td>
   </tr>
 </template>
 
 <template name="user_bill">
   <tr class="user_bill">
-    <td>
-      <input type="button" class="delete_user_bill" value="delete" data-userbillid={{_id}} />
-    </td>
     <td>
       {{identify_user user}}
     </td>
@@ -190,14 +187,14 @@
     <td>
       ${{owed}}
     </td>
+    <td>
+      <input type="button" class="delete_user_bill" value="delete" data-userbillid={{_id}} />
+    </td>
   </tr>
 </template>
 
 <template name="payment">
   <tr class="payment">
-    <td>
-      <input type="button" class="delete_payment" value="delete" data-paymentid={{_id}} />
-    </td>
     <td>
       From: {{identify_user payer}}
     </td>
@@ -207,5 +204,6 @@
     <td>
       ${{amount}}
     </td>
+
   </tr>
 </template>
