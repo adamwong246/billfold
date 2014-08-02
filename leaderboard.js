@@ -25,45 +25,6 @@ Handlebars.registerHelper("identify_bill", function(bill){
   return b && b.name ? b.name : "";
 });
 
-function ownage(user_bill) {
-  var user = Meteor.users.findOne(user_bill.user);
-  var bill = Bills.findOne(user_bill.bill);
-
-  if (bill && user ) {
-    if ((user_bill.arrival_date <= bill.departure_date) && (user_bill.departure_date >= bill.arrival_date)) {
-
-      // the difference in days of the bill's timespan
-      var timeDiff = Math.abs(bill.departure_date.getTime() - bill.arrival_date.getTime());
-      var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-      
-      // range to calculate over
-      var lesser  = new Date(Math.max  (user_bill.arrival_date, bill.arrival_date));
-      var greater = new Date(Math.min  (user_bill.departure_date, bill.departure_date));
-
-      var accumulator = 0;
-
-      for (var d = lesser; d < greater; d.setDate(d.getDate() + 1)) {
-
-        // number of UserBills present on this day
-        var user_count = UserBills.find({ arrival_date: { $lt: d }, departure_date: { $gt: d }, bill: bill._id }).count();
-        
-        // prevent division by zero
-        if (user_count > 0){
-          // add to accumulated total payment for user and bill
-          accumulator += ((bill.amount / user_count)/diffDays);
-        }
-
-      }
-
-      return accumulator;
-    }
-
-    return 0;
-  } else {
-    return 'fail';
-  }
-}
-
 if (Meteor.isClient) {
 
   Template.grid.users = function (){
@@ -80,42 +41,7 @@ if (Meteor.isClient) {
   Template.grid.payments  = function () {return Payments.find({});};
 
   Template.user_bill.owed = function () {
-    var user = Meteor.users.findOne(this.user);
-    var bill = Bills.findOne(this.bill);
-
-    if (bill && user ) {
-      if ((this.arrival_date <= bill.departure_date) && (this.departure_date >= bill.arrival_date)) {
-
-        // the difference in days of the bill's timespan
-        var timeDiff = Math.abs(bill.departure_date.getTime() - bill.arrival_date.getTime());
-        var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-        
-        // range to calculate over
-        var lesser  = new Date(Math.max  (this.arrival_date, bill.arrival_date));
-        var greater = new Date(Math.min  (this.departure_date, bill.departure_date));
-
-        var accumulator = 0;
-
-        for (var d = lesser; d < greater; d.setDate(d.getDate() + 1)) {
-
-          // number of UserBills present on this day
-          var user_count = UserBills.find({ arrival_date: { $lt: d }, departure_date: { $gt: d }, bill: this.bill }).count();
-          
-          // prevent division by zero
-          if (user_count > 0){
-            // add to accumulated total payment for user and bill
-            accumulator += ((bill.amount / user_count)/diffDays);
-          }
-
-        }
-
-        return accumulator;
-      }
-
-      return 0;
-    } else {
-      return 'fail';
-    }
+    return ownage(this);
   };
 
   Template.grid.user_owes_user = function(option){
@@ -139,15 +65,12 @@ if (Meteor.isClient) {
 
   Template.grid.paid = function (options) {
     payment = Payments.findOne({bill_id: options.hash.bill_id, roommate_id: options.hash.roommate_id});
-
     if (payment){
       return payment;
     } else{
       return "nada";
     }
-    // return 'derp';
   };
-
 
   Template.grid.events({
 
@@ -246,7 +169,6 @@ if (Meteor.isServer) {
       });
     });
 
-
     // if (UserBills.find().count() === 0) {
     //   var names = ["Ada Lovelace",
     //                "Grace Hopper",
@@ -277,3 +199,43 @@ if (Meteor.isServer) {
 
   });
 }
+
+function ownage(user_bill) {
+  var user = Meteor.users.findOne(user_bill.user);
+  var bill = Bills.findOne(user_bill.bill);
+
+  if (bill && user ) {
+    if ((user_bill.arrival_date <= bill.departure_date) && (user_bill.departure_date >= bill.arrival_date)) {
+
+      // the difference in days of the bill's timespan
+      var timeDiff = Math.abs(bill.departure_date.getTime() - bill.arrival_date.getTime());
+      var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+      
+      // range to calculate over
+      var lesser  = new Date(Math.max  (user_bill.arrival_date, bill.arrival_date));
+      var greater = new Date(Math.min  (user_bill.departure_date, bill.departure_date));
+
+      var accumulator = 0;
+
+      for (var d = lesser; d < greater; d.setDate(d.getDate() + 1)) {
+
+        // number of UserBills present on this day
+        var user_count = UserBills.find({ arrival_date: { $lt: d }, departure_date: { $gt: d }, bill: bill._id }).count();
+        
+        // prevent division by zero
+        if (user_count > 0){
+          // add to accumulated total payment for user and bill
+          accumulator += ((bill.amount / user_count)/diffDays);
+        }
+
+      }
+
+      return accumulator;
+    }
+
+    return 0;
+  } else {
+    return 'fail';
+  }
+}
+
