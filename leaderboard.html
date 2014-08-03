@@ -12,132 +12,185 @@
 <template name="grid">
   {{> loginButtons}}
 
-  <h4> Add a new Bill </h4>
-  <form class="new_bill">
-    <input type="text" name="name" placeholder="bill name" />
-    <br>
-    <input type="number" name="amount" placeholder="amount" step="any" />
-    <br>
-    <label for="arrival_date">Arrival date</label>
-    <input type="date" name="arrival_date" />
-    <br>
-    <label for="departure_date">Departure date</label>
-    <input type="date" name="departure_date" />
-    <br>
-    <select name="owner" >
-      {{#each users}}
-        <option value="{{_id}}">{{identify_user _id}}</option>
-      {{/each}}
-    </select>
-    <br>
-    <input type="submit" value="New Bill">
-  </form>
 
-  <h4> Add a new UserBill </h4>
-  <form class="new_user_bill">
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#bills" role="tab" data-toggle="tab">Bills</a></li>
+    <li><a href="#user_bills" role="tab" data-toggle="tab">UserBills</a></li>
+    <li><a href="#payments" role="tab" data-toggle="tab">Payments</a></li>
+    <li><a href="#users" role="tab" data-toggle="tab">Users</a></li>
+    <li><a href="#balances" role="tab" data-toggle="tab">Balances</a></li>
+  </ul>
 
-    <select name="user" >
-      {{#each users}}
-        <option value="{{_id}}">{{identify_user _id}}</option>
-      {{/each}}
-    </select>
-    <br>
-    <select name="bill" >
-      {{#each bills}}
-        <option value="{{_id}}">{{name}}</option>
-      {{/each}}
-    </select>
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div class="tab-pane active" id="bills">
+      <form class="new_bill">
+        <input type="text" name="name" placeholder="bill name" />
+        <br>
+        <input type="number" name="amount" placeholder="amount" step="any" />
+        <br>
+        <label for="arrival_date">Arrival date</label>
+        <input type="date" name="arrival_date" />
+        <br>
+        <label for="departure_date">Departure date</label>
+        <input type="date" name="departure_date" />
+        <br>
+        <select name="owner" >
+          {{#each users}}
+            <option value="{{_id}}">{{identify_user _id}}</option>
+          {{/each}}
+        </select>
+        <br>
+        <input type="submit" value="New Bill">
+      </form>
 
-    <br>
-    <label for="arrival_date">Arrival date</label>
-    <input type="date" name="arrival_date"/>
-    <br>
-    <label for="departure_date">Departure date</label>
-    <input type="date" name="departure_date"/>
-    <br>
-    <input type="submit" value="New user bill">
-  </form>
+      <table>
+        <tr>
+          <th>
+            bill
+          </th>
+          <th>
+            in the name of
+          </th>
+          <th>
+            in the amount of
+          </th>
+          <th>
+            start date
+          </th>
+          <th>
+            end date
+          </th>
+        </tr>
+        {{#each bills}}
+          {{> bill}}
+        {{/each}}
+      </table>
+    </div>
+    <div class="tab-pane" id="user_bills">
+      <form class="new_user_bill">
 
-  <h4> Add a new payment </h4>
-  <form class="new_payment">
-    payer:
-    <select name="payer" >
-      {{#each users}}
-        <option value="{{_id}}">{{identify_user this}}</option>
-      {{/each}}
-    </select>
-    <br>
-    payee:
-    <select name="payee" >
-      {{#each users}}
-        <option value="{{_id}}">{{identify_user this}}</option>
-      {{/each}}
-    </select>
-    <br>
-    <input type="number" name="amount" placeholder="amount" step="any" />
-    <br>
-    <input type="submit" value="New Payment">
-  </form>
+        <select name="user" >
+          {{#each users}}
+            <option value="{{_id}}">{{identify_user _id}}</option>
+          {{/each}}
+        </select>
+        <br>
+        <select name="bill" >
+          {{#each bills}}
+            <option value="{{_id}}">{{name}}</option>
+          {{/each}}
+        </select>
 
-  <h4> users </h4>
-  <ol>
-    {{#each users}}
-      <li>
-        {{> user}}
-      </li>
-    {{/each}}
-  </ol>
+        <br>
+        <label for="arrival_date">Arrival date</label>
+        <input type="date" name="arrival_date"/>
+        <br>
+        <label for="departure_date">Departure date</label>
+        <input type="date" name="departure_date"/>
+        <br>
+        <input type="submit" value="New user bill">
+      </form>
 
-  <h4> bills </h4>
-  <table>
-    {{#each bills}}
-      {{> bill}}
-    {{/each}}
-  </table>
+      <table>
+        <tr>
+          <th>
+            payer
+          </th>
+          <th>
+            bill
+          </th>
+          <th>
+            start date
+          </th>
+          <th>
+            end date
+          </th>
+          <th>
+            owed
+          </th>
+        </tr>
+        {{#each user_bills}}
+          {{> user_bill}}
+        {{/each}}
+      </table>
+    </div>
+    <div class="tab-pane" id="payments">
+      <form class="new_payment">
+        payer:
+        <select name="payer" >
+          {{#each users}}
+            <option value="{{_id}}">{{identify_user this}}</option>
+          {{/each}}
+        </select>
+        <br>
+        payee:
+        <select name="payee" >
+          {{#each users}}
+            <option value="{{_id}}">{{identify_user this}}</option>
+          {{/each}}
+        </select>
+        <br>
+        <input type="number" name="amount" placeholder="amount" step="any" />
+        <br>
+        <input type="submit" value="New Payment">
+      </form>
 
-  <h4> user bills </h4>
-  <table>
-    {{#each user_bills}}
-      {{> user_bill}}
-    {{/each}}
-  </table>
-
-  <h4> payments </h4>
-  <table>
-    {{#each payments}}
-      {{> payment}}
-    {{/each}}
-  </table>
-
-  <h3>Balance sheet</h3>
-  <table>
-    <tr>
-      <td></td>
-      {{#each users}}
-        <td>
-          {{identify_user this}}
-        </td>
-      {{/each}}
-    </tr>
-
-    {{#each users}}
-      <tr>
-        <td>
-          {{identify_user this}}
-        </td>
+      <table>
+        <tr>
+          <th>
+            payer
+          </th>
+          <th>
+            payee
+          </th>
+          <th>
+            amount
+          </th>
+        </tr>  
+        {{#each payments}}
+          {{> payment}}
+        {{/each}}
+      </table>
+    </div>
+    <div class="tab-pane" id="users">
+      <ol>
+        {{#each users}}
+          <li>
+            {{> user}}
+          </li>
+        {{/each}}
+      </ol>
+    </div>
+    <div class="tab-pane" id="balances">
+      <table>
+        <tr>
+          <td></td>
+          {{#each users}}
+            <td>
+              {{identify_user this}}
+            </td>
+          {{/each}}
+        </tr>
 
         {{#each users}}
-          <td>
-            {{!identify_user this}}
-            {{!identify_user ..}}
-            {{user_owes_user payer=this payee=..}}
-          </td>
+          <tr>
+            <td>
+              {{identify_user this}}
+            </td>
+
+            {{#each users}}
+              <td>
+                {{!identify_user this}}
+                {{!identify_user ..}}
+                {{user_owes_user payer=this payee=..}}
+              </td>
+            {{/each}}
+          </tr>
         {{/each}}
-
-      </tr>
-    {{/each}}
-
-  </table>
+      </table>
+    </div>
+  </div>
 
 </template>
 
@@ -196,10 +249,10 @@
 <template name="payment">
   <tr class="payment">
     <td>
-      From: {{identify_user payer}}
+      {{identify_user payer}}
     </td>
     <td>
-      To: {{identify_user payee}}
+      {{identify_user payee}}
     </td>
     <td>
       ${{amount}}
