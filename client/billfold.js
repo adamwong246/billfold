@@ -32,136 +32,124 @@ Template.grid.users = function (){
         _id: 1
       }
     });
-  };
+};
+Template.grid.user_bills = function () {return UserBills.find({});};
+Template.grid.bills     = function () {return Bills.find({});};
+Template.grid.payments  = function () {return Payments.find({});};
 
-  Template.grid.user_bills = function () {return UserBills.find({});};
-  Template.grid.bills     = function () {return Bills.find({});};
-  Template.grid.payments  = function () {return Payments.find({});};
+Template.user_bill.owed = function () {
+  return ownage(this);
+};
 
-  Template.user_bill.owed = function () {
-    return ownage(this);
-  };
+Template.grid.user_owes_user = function(option){
+  var user_bills = UserBills.find({user: option.hash.payer._id});
 
-  Template.grid.user_owes_user = function(option){
+  if (user_bills.count() < 1 ) {
+    return 0;
+  } else {
+    return user_bills.fetch().filter(function(ub){
+      return Bills.find({_id: ub.bill, owner: option.hash.payee._id}).count() == 1;
+    }).reduce(function(m, e, i, a){
+      return m + ownage(e);
+    }, 0) - Payments.find({payer: option.hash.payer._id, payee: option.hash.payee._id}).fetch().reduce(function(m,e,i,a){
+      return m + parseInt(e.amount);
+    }, 0);
 
-    var user_bills = UserBills.find({user: option.hash.payer._id});//.filter(function(ub){
-    //   return Bills.findOne({}, {user: option.hash.payee._id});
-    // });
+  }
 
-    if (user_bills.count() < 1 ) {
-      return 0;
-    } else {
-      return user_bills.fetch().filter(function(ub){
-        return Bills.find({_id: ub.bill, owner: option.hash.payee._id}).count() == 1;
-      }).reduce(function(m, e, i, a){
-        return m + ownage(e);
-      }, 0) - Payments.find({payer: option.hash.payer._id, payee: option.hash.payee._id}).fetch().reduce(function(m,e,i,a){
-        return m + parseInt(e.amount);
-      }, 0);
+};
 
-    }
+Template.grid.paid = function (options) {
+  payment = Payments.findOne({bill_id: options.hash.bill_id, roommate_id: options.hash.roommate_id});
+  if (payment){
+    return payment;
+  } else{
+    return "nada";
+  }
+};
 
-  };
+Template.grid.events({
 
-  Template.grid.paid = function (options) {
-    payment = Payments.findOne({bill_id: options.hash.bill_id, roommate_id: options.hash.roommate_id});
-    if (payment){
-      return payment;
-    } else{
-      return "nada";
-    }
-  };
+  'submit form.new_bill': function(event) {
+    Bills.insert({
+      name: event.target.elements.namedItem('name').value,
+      arrival_date: (
+        (event.target.elements.namedItem('arrival_date').value == "") ? null : new Date(event.target.elements.namedItem('arrival_date').value)
+      ),
+      departure_date: (
+        (event.target.elements.namedItem('departure_date').value == "") ? null : new Date(event.target.elements.namedItem('departure_date').value)
+      ),
+      amount: event.target.elements.namedItem('amount').value,
+      owner: event.target.elements.namedItem('owner').value
+    });
+  },
 
-  Template.grid.events({
+  'submit form.new_user_bill': function(event) {
+    console.log(event);
+    UserBills.insert({
+      user: event.target.elements.namedItem('user').value,
+      bill: event.target.elements.namedItem('bill').value,
+      arrival_date: (
+        (event.target.elements.namedItem('arrival_date').value == "") ? null : new Date(event.target.elements.namedItem('arrival_date').value)
+      ),
+      departure_date: (
+        (event.target.elements.namedItem('departure_date').value == "") ? null : new Date(event.target.elements.namedItem('departure_date').value)
+      ),
+    });
+  },
 
-    // 'submit form.new_roommate': function(event) {
-    //   UserBills.insert({
-    //     name: event.target.elements.namedItem('name').value,
-    //     arrival_date: new Date(event.target.elements.namedItem('arrival_date').value),
-    //     departure_date: new Date(event.target.elements.namedItem('departure_date').value),
-    //   });
-    // },
+  'submit form.new_payment': function(event) {
+    Payments.insert({
+      payer: event.target.elements.namedItem('payer').value,
+      payee: event.target.elements.namedItem('payee').value,
+      amount: event.target.elements.namedItem('amount').value
+    });
+  },
 
-    'submit form.new_bill': function(event) {
-      Bills.insert({
-        name: event.target.elements.namedItem('name').value,
-        arrival_date: (
-          (event.target.elements.namedItem('arrival_date').value == "") ? null : new Date(event.target.elements.namedItem('arrival_date').value)
-        ),
-        departure_date: (
-          (event.target.elements.namedItem('departure_date').value == "") ? null : new Date(event.target.elements.namedItem('departure_date').value)
-        ),
-        amount: event.target.elements.namedItem('amount').value,
-        owner: event.target.elements.namedItem('owner').value
-      });
-    },
+  'click input.delete_bill': function (event) {
+    Bills.remove(event.target.dataset.billid);
+  },
 
-    'submit form.new_user_bill': function(event) {
-      console.log(event);
-      UserBills.insert({
-        user: event.target.elements.namedItem('user').value,
-        bill: event.target.elements.namedItem('bill').value,
-        arrival_date: (
-          (event.target.elements.namedItem('arrival_date').value == "") ? null : new Date(event.target.elements.namedItem('arrival_date').value)
-        ),
-        departure_date: (
-          (event.target.elements.namedItem('departure_date').value == "") ? null : new Date(event.target.elements.namedItem('departure_date').value)
-        ),
-      });
-    },
+  'click input.delete_user_bill': function (event) {
+    UserBills.remove(event.target.dataset.userbillid);
+  },
+  
+  'click input.delete_payment': function (event) {
+    Payments.remove(event.target.dataset.paymentid);
+  },
 
-    'submit form.new_payment': function(event) {
-      Payments.insert({
-        payer: event.target.elements.namedItem('payer').value,
-        payee: event.target.elements.namedItem('payee').value,
-        amount: event.target.elements.namedItem('amount').value
-      });
-    },
+  // "blur input[name='name']": function (event) {
+  //   UserBills.update(event.target.dataset.roommateid, {$set: {name: event.target.value}});
+  // },
 
-    'click input.delete_bill': function (event) {
-      Bills.remove(event.target.dataset.billid);
-    },
+  // "blur input[name='arrival_date']": function (event) {
+  //   UserBills.update(event.target.dataset.roommateid, {$set: {arrival_date: new Date(event.target.value)}});
+  // },
+  
+  // "blur input[name='departure_date']": function (event) {
+  //   UserBills.update(event.target.dataset.roommateid, {$set: {departure_date: new Date(event.target.value)}});
+  // },
 
-    'click input.delete_user_bill': function (event) {
-      UserBills.remove(event.target.dataset.userbillid);
-    },
-    
-    'click input.delete_payment': function (event) {
-      Payments.remove(event.target.dataset.paymentid);
-    },
+  // "blur input[name='name']": function (event) {
+  //   Bills.update(event.target.dataset.billid, {$set: {name: event.target.value}});
+  // },
 
-    // "blur input[name='name']": function (event) {
-    //   UserBills.update(event.target.dataset.roommateid, {$set: {name: event.target.value}});
-    // },
+  // "blur input[name='amount']": function (event) {
+  //   Bills.update(event.target.dataset.billid, {$set: {amount: event.target.value}});
+  // },
 
-    // "blur input[name='arrival_date']": function (event) {
-    //   UserBills.update(event.target.dataset.roommateid, {$set: {arrival_date: new Date(event.target.value)}});
-    // },
-    
-    // "blur input[name='departure_date']": function (event) {
-    //   UserBills.update(event.target.dataset.roommateid, {$set: {departure_date: new Date(event.target.value)}});
-    // },
+  // "blur input[name='arrival_date']": function (event) {
+  //   Bills.update(event.target.dataset.billid, {$set: {arrival_date: new Date(event.target.value)}});
+  // },
+  
+  // "blur input[name='departure_date']": function (event) {
+  //   Bills.update(event.target.dataset.billid, {$set: {departure_date: new Date(event.target.value)}});
+  // },
 
-    // "blur input[name='name']": function (event) {
-    //   Bills.update(event.target.dataset.billid, {$set: {name: event.target.value}});
-    // },
-
-    // "blur input[name='amount']": function (event) {
-    //   Bills.update(event.target.dataset.billid, {$set: {amount: event.target.value}});
-    // },
-
-    // "blur input[name='arrival_date']": function (event) {
-    //   Bills.update(event.target.dataset.billid, {$set: {arrival_date: new Date(event.target.value)}});
-    // },
-    
-    // "blur input[name='departure_date']": function (event) {
-    //   Bills.update(event.target.dataset.billid, {$set: {departure_date: new Date(event.target.value)}});
-    // },
-
-    // 'click input.delete_payment': function (event) {
-    //   Payments.remove(event.target.dataset.paymentid);
-    // },
-  });
+  // 'click input.delete_payment': function (event) {
+  //   Payments.remove(event.target.dataset.paymentid);
+  // },
+});
 
 function ownage(user_bill) {
   var user = Meteor.users.findOne(user_bill.user);

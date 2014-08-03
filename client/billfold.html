@@ -181,8 +181,6 @@
 
             {{#each users}}
               <td>
-                {{!identify_user this}}
-                {{!identify_user ..}}
                 {{user_owes_user payer=this payee=..}}
               </td>
             {{/each}}
