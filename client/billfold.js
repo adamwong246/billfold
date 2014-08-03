@@ -1,7 +1,3 @@
-UserBills = new Meteor.Collection("user_bills");
-Bills     = new Meteor.Collection("bills");
-Payments  = new Meteor.Collection('payments');
-
 Handlebars.registerHelper("prettifyDate", function(date) {
   if (date == null) {
     return date;
@@ -29,9 +25,7 @@ Handlebars.registerHelper("identify_bill", function(bill){
   return b && b.name ? b.name : "";
 });
 
-if (Meteor.isClient) {
-
-  Template.grid.users = function (){
+Template.grid.users = function (){
     return Meteor.users.find({}, {
       fields: {
         emails: 1,
@@ -169,51 +163,6 @@ if (Meteor.isClient) {
     // },
   });
 
-}
-
-// On server startup, create some players if the database is empty.
-if (Meteor.isServer) {
-  Meteor.startup(function () {
-    
-    Meteor.publish(null, function() {
-      return Meteor.users.find({}, {
-        fields: {
-          emails: 1
-        }
-      });
-    });
-
-    // if (UserBills.find().count() === 0) {
-    //   var names = ["Ada Lovelace",
-    //                "Grace Hopper",
-    //                "Marie Curie",
-    //                "Carl Friedrich Gauss",
-    //                "Nikola Tesla",
-    //                "Claude Shannon"];
-    //   for (var i = 0; i < names.length; i++)
-    //     UserBills.insert({name: names[i], score: Math.floor(Random.fraction()*10)*5});
-    // }
-
-    // if (Bills.find().count() === 0) {
-    //   [
-    //     {
-    //       "name":"electric",
-    //       "amount":"99.87",
-    //       "start_date": moment().subtract('days', 10).calendar(),
-    //       "end_date": moment().add('days', 20).calendar()
-    //     }
-    //   ]
-      // var b_names = ["Electric",
-      //              "Water"];
-      // for (var j = 0; j < b_names.length; j++)
-      //   Bills.insert({
-      //     name: b_names[j],
-      //     score: Math.floor(Random.fraction()*10)*5});
-    // }
-
-  });
-}
-
 function ownage(user_bill) {
   var user = Meteor.users.findOne(user_bill.user);
   var bill = Bills.findOne(user_bill.bill);
@@ -252,4 +201,3 @@ function ownage(user_bill) {
     return 'fail';
   }
 }
-
