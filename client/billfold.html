@@ -5,14 +5,21 @@
 <body>
   <h1> BillFold </h1>
   <div id="outer">
-    {{> grid }}
+    
+    {{> loginButtons}}
+
+    {{#if currentUser}}
+      {{> grid }}
+    {{else}} 
+      <h3>
+        BillFold is the easy and free way to track expenses with friends.
+      </h3>
+    {{/if}}
+
   </div>
 </body>
 
 <template name="grid">
-  {{> loginButtons}}
-
-
   <ul class="nav nav-tabs" role="tablist">
     <li class="active"><a href="#bills" role="tab" data-toggle="tab">Bills</a></li>
     <li><a href="#user_bills" role="tab" data-toggle="tab">UserBills</a></li>
