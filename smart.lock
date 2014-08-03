@@ -2,13 +2,19 @@
   "meteor": {},
   "dependencies": {
     "basePackages": {
-      "moment": {}
+      "moment": {},
+      "roles": {}
     },
     "packages": {
       "moment": {
         "git": "https://github.com/acreeger/meteor-moment.git",
         "tag": "v2.6.0",
         "commit": "26156df681750fd6e6ed77043eef32b6653ebbdf"
+      },
+      "roles": {
+        "git": "https://github.com/alanning/meteor-roles.git",
+        "tag": "v1.2.10",
+        "commit": "7ccb35de0a6cb0c9a0c3666badd04757e39c09a6"
       }
     }
   }

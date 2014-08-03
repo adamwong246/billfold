@@ -9,6 +9,10 @@
     {{> loginButtons}}
 
     {{#if currentUser}}
+      {{#if isInRole 'admin,view-secrets'}}
+        <span class="label label-warning">Warning! You have the Admin role!</span>
+      {{/if}}
+
       {{> grid }}
     {{else}} 
       <h3>
