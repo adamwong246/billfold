@@ -156,7 +156,9 @@ function ownage(user_bill) {
   var bill = Bills.findOne(user_bill.bill);
 
   if (bill && user ) {
-    if ((user_bill.arrival_date <= bill.departure_date) && (user_bill.departure_date >= bill.arrival_date)) {
+    if (bill.arrival_date == null && bill.arrival_date == null){
+      return bill.amount/UserBills.find({bill: bill._id }).count();
+    } else if ((user_bill.arrival_date <= bill.departure_date) && (user_bill.departure_date >= bill.arrival_date)) {
 
       // the difference in days of the bill's timespan
       var timeDiff = Math.abs(bill.departure_date.getTime() - bill.arrival_date.getTime());
