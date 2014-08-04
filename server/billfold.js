@@ -15,3 +15,12 @@ Meteor.publish('payments', function() {
 Meteor.publish('users', function() {
   return Meteor.users.find({});
 });
+
+var BillTable;
+
+BillTable = new DataTableComponent({
+  subscription: "bills_table",
+  collection: Bills
+});
+
+BillTable.publish();

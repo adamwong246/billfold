@@ -35,6 +35,7 @@
   <!-- Tab panes -->
   <div class="tab-content">
     <div class="tab-pane active" id="bills">
+
       <form class="new_bill">
         <input type="text" name="name" placeholder="bill name" />
         <br>
@@ -55,28 +56,8 @@
         <input type="submit" value="New Bill">
       </form>
 
-      <table>
-        <tr>
-          <th>
-            bill
-          </th>
-          <th>
-            in the name of
-          </th>
-          <th>
-            in the amount of
-          </th>
-          <th>
-            start date
-          </th>
-          <th>
-            end date
-          </th>
-        </tr>
-        {{#each bills}}
-          {{> bill}}
-        {{/each}}
-      </table>
+      {{> DataTable bills_table }}
+
     </div>
     <div class="tab-pane" id="user_bills">
       <form class="new_user_bill">
@@ -209,28 +190,6 @@
   </div>
 </template>
 
-<template name="bill">
-  <tr class="bill">
-    <td>
-      {{name}}
-    </td>
-    <td>
-      {{identify_user owner}}
-    </td>
-    <td>
-      ${{amount}}
-    </td>
-    <td>
-      {{prettifyDate arrival_date}}
-    </td>
-    <td>
-      {{prettifyDate departure_date}}
-    </td>
-    <td>
-      <input type="button" class="delete_bill" value="delete" data-billid={{_id}} />
-    </td>
-  </tr>
-</template>
 
 <template name="user_bill">
   <tr class="user_bill">

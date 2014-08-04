@@ -1,6 +1,7 @@
 {
   "packages": {
     "moment": {},
-    "roles": {}
+    "roles": {},
+    "jquery-datatables": {}
   }
 }

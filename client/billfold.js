@@ -31,6 +31,8 @@ Handlebars.registerHelper('arrayify',function(obj){
     return result;
 });
 
+
+
 Deps.autorun(function() {
   Meteor.subscribe('bills');
   Meteor.subscribe('user_bills');
@@ -51,6 +53,33 @@ Deps.autorun(function() {
 
   Template.grid.users = function(){
     return Meteor.users.find({});
+  };
+
+  Template.grid.bills_table = function() {
+    return {
+      id: "foobar",
+
+      columns: [
+        {
+          title: "NAME",
+          data: "name"
+        },
+        {
+          title: "AMOUNT",
+          data: "amount"
+        },
+        {
+          title: "START",
+          data: "arrival_date"
+        },
+        {
+          title: "END",
+          data: "departure_date"
+        }
+      ],
+      subscription: "bills_table",
+      query: {}
+    };
   };
 
   Template.user_bill.owed = function () {

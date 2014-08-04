@@ -3,7 +3,8 @@
   "dependencies": {
     "basePackages": {
       "moment": {},
-      "roles": {}
+      "roles": {},
+      "jquery-datatables": {}
     },
     "packages": {
       "moment": {
@@ -15,6 +16,16 @@
         "git": "https://github.com/alanning/meteor-roles.git",
         "tag": "v1.2.10",
         "commit": "7ccb35de0a6cb0c9a0c3666badd04757e39c09a6"
+      },
+      "jquery-datatables": {
+        "git": "https://github.com/lumapictures/meteor-jquery-datatables",
+        "tag": "v1.0.5",
+        "commit": "fe4fb3178386f88eeac9139b7680646b320e321d"
+      },
+      "luma-component": {
+        "git": "https://github.com/LumaPictures/meteor-luma-component",
+        "tag": "v1.0.5",
+        "commit": "9d567068048e9ca82699b096e78c3f7ec76c0fa4"
       }
     }
   }
