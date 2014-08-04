@@ -25,48 +25,57 @@ Handlebars.registerHelper("identify_bill", function(bill){
   return b && b.name ? b.name : "";
 });
 
-Template.grid.users = function (){
-    return Meteor.users.find({}, {
-      fields: {
-        emails: 1,
-        _id: 1
-      }
-    });
-};
-Template.grid.user_bills = function () {return UserBills.find({});};
-Template.grid.bills     = function () {return Bills.find({});};
-Template.grid.payments  = function () {return Payments.find({});};
+Handlebars.registerHelper('arrayify',function(obj){
+    result = [];
+    for (var key in obj) result.push({name:key,value:obj[key]});
+    return result;
+});
 
-Template.user_bill.owed = function () {
-  return ownage(this);
-};
+Deps.autorun(function() {
+  Meteor.subscribe('bills');
+  Meteor.subscribe('user_bills');
+  Meteor.subscribe('payments');
+  Meteor.subscribe('users');
 
-Template.grid.user_owes_user = function(option){
-  var user_bills = UserBills.find({user: option.hash.payer._id});
+  Template.grid.user_bills = function(){
+    return UserBills.find({});
+  };
 
-  if (user_bills.count() < 1 ) {
-    return 0;
-  } else {
-    return user_bills.fetch().filter(function(ub){
-      return Bills.find({_id: ub.bill, owner: option.hash.payee._id}).count() == 1;
-    }).reduce(function(m, e, i, a){
-      return m + ownage(e);
-    }, 0) - Payments.find({payer: option.hash.payer._id, payee: option.hash.payee._id}).fetch().reduce(function(m,e,i,a){
-      return m + parseInt(e.amount);
-    }, 0);
+  Template.grid.bills = function(){
+    return Bills.find({});
+  };
 
-  }
+  Template.grid.payments = function(){
+    return Payments.find({});
+  };
 
-};
+  Template.grid.users = function(){
+    return Meteor.users.find({});
+  };
 
-Template.grid.paid = function (options) {
-  payment = Payments.findOne({bill_id: options.hash.bill_id, roommate_id: options.hash.roommate_id});
-  if (payment){
-    return payment;
-  } else{
-    return "nada";
-  }
-};
+  Template.user_bill.owed = function () {
+    return ownage(this);
+  };
+
+  Template.grid.user_owes_user = function(option){
+    var user_bills = UserBills.find({user: option.hash.payer._id});
+
+    if (user_bills.count() < 1 ) {
+      return 0;
+    } else {
+      return user_bills.fetch().filter(function(ub){
+        return Bills.find({_id: ub.bill, owner: option.hash.payee._id}).count() == 1;
+      }).reduce(function(m, e, i, a){
+        return m + ownage(e);
+      }, 0) - Payments.find({payer: option.hash.payer._id, payee: option.hash.payee._id}).fetch().reduce(function(m,e,i,a){
+        return m + parseInt(e.amount);
+      }, 0);
+
+    }
+
+  };
+
+});
 
 Template.grid.events({
 
@@ -116,40 +125,9 @@ Template.grid.events({
   
   'click input.delete_payment': function (event) {
     Payments.remove(event.target.dataset.paymentid);
-  },
-
-  // "blur input[name='name']": function (event) {
-  //   UserBills.update(event.target.dataset.roommateid, {$set: {name: event.target.value}});
-  // },
-
-  // "blur input[name='arrival_date']": function (event) {
-  //   UserBills.update(event.target.dataset.roommateid, {$set: {arrival_date: new Date(event.target.value)}});
-  // },
-  
-  // "blur input[name='departure_date']": function (event) {
-  //   UserBills.update(event.target.dataset.roommateid, {$set: {departure_date: new Date(event.target.value)}});
-  // },
-
-  // "blur input[name='name']": function (event) {
-  //   Bills.update(event.target.dataset.billid, {$set: {name: event.target.value}});
-  // },
-
-  // "blur input[name='amount']": function (event) {
-  //   Bills.update(event.target.dataset.billid, {$set: {amount: event.target.value}});
-  // },
-
-  // "blur input[name='arrival_date']": function (event) {
-  //   Bills.update(event.target.dataset.billid, {$set: {arrival_date: new Date(event.target.value)}});
-  // },
-  
-  // "blur input[name='departure_date']": function (event) {
-  //   Bills.update(event.target.dataset.billid, {$set: {departure_date: new Date(event.target.value)}});
-  // },
-
-  // 'click input.delete_payment': function (event) {
-  //   Payments.remove(event.target.dataset.paymentid);
-  // },
+  }
 });
+
 
 function ownage(user_bill) {
   var user = Meteor.users.findOne(user_bill.user);
@@ -191,3 +169,46 @@ function ownage(user_bill) {
     return 'fail';
   }
 }
+
+//   // "blur input[name='name']": function (event) {
+//   //   UserBills.update(event.target.dataset.roommateid, {$set: {name: event.target.value}});
+//   // },
+
+//   // "blur input[name='arrival_date']": function (event) {
+//   //   UserBills.update(event.target.dataset.roommateid, {$set: {arrival_date: new Date(event.target.value)}});
+//   // },
+  
+//   // "blur input[name='departure_date']": function (event) {
+//   //   UserBills.update(event.target.dataset.roommateid, {$set: {departure_date: new Date(event.target.value)}});
+//   // },
+
+//   // "blur input[name='name']": function (event) {
+//   //   Bills.update(event.target.dataset.billid, {$set: {name: event.target.value}});
+//   // },
+
+//   // "blur input[name='amount']": function (event) {
+//   //   Bills.update(event.target.dataset.billid, {$set: {amount: event.target.value}});
+//   // },
+
+//   // "blur input[name='arrival_date']": function (event) {
+//   //   Bills.update(event.target.dataset.billid, {$set: {arrival_date: new Date(event.target.value)}});
+//   // },
+  
+//   // "blur input[name='departure_date']": function (event) {
+//   //   Bills.update(event.target.dataset.billid, {$set: {departure_date: new Date(event.target.value)}});
+//   // },
+
+//   // 'click input.delete_payment': function (event) {
+//   //   Payments.remove(event.target.dataset.paymentid);
+//   // },
+// });
+
+// Template.grid.paid = function (options) {
+//   payment = Payments.findOne({bill_id: options.hash.bill_id, roommate_id: options.hash.roommate_id});
+//   if (payment){
+//     return payment;
+//   } else{
+//     return "nada";
+//   }
+// };
+
